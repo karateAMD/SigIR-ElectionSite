@@ -31,6 +31,13 @@
       		});
       });
       </script>
+      <p>
+    		<ul>
+    		{% for state in states_list %}
+    			<li>{{state.abbreviation}}	-	{{state.name}} </li>
+    		{% endfor %}
+    		</ul>
+      </p>
   </body>
 </html>
   
