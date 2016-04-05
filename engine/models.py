@@ -15,16 +15,19 @@ class State(models.Model):
 class SearchTerm(models.Model):
 	state = models.ForeignKey(State)
 
-	text = models.CharField(max_length=20)
+	text = models.CharField(max_length=20, unique=True)
 
 	def __unicode__(self):
 		return self.text
+	
+	class Meta:
+		ordering = ('text',)
 
 class Candidate(models.Model):
 	state = models.ManyToManyField(State)
 
 	first_name = models.CharField(max_length=15, default='')
-	last_name = models.CharField(max_length=15, default='')
+	last_name = models.CharField(max_length=15, default='', unique=True)
 
 	def __unicode__(self):
 		return self.first_name + " " + self.last_name
