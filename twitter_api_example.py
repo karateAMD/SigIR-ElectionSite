@@ -10,16 +10,18 @@ import json
 
 import re, string
 
+#API Keys
+import keys
 # AlchemyAPI
 from alchemyapi import AlchemyAPI
 alchemyapi = AlchemyAPI()
-alchemyapi.apikey = "6ef2cc0d08007ca6c2710c697466a5ed206ff487"
+alchemyapi.apikey = keys.alchemy_apikey
 
 #TwitterAPI keys
-consumer_key = 	"dV62jowOdyOGFHXTz2n8S0m7k"
-consumer_secret = "wpar83p7x8jFVm3ZGc5QSD1ThlbKG8gN3s0aBEqdqrxMpyALuQ"
-access_token = "632282263-UxE1BZfYhs1socKlm2gKJXUxont6PZWhpRFWRIfM"
-access_token_secret = "fkQBXFFpg9L5wGqDmON4hJadcz9HkkhWFo31eBFkihYOu"
+consumer_key = keys.twitter_consumer_key
+consumer_secret = keys.twitter_consumer_secret
+access_token = keys.twitter_access_token
+access_token_secret = keys.twitter_access_token_secret
 
 
 # Tweet object
