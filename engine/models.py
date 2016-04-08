@@ -7,7 +7,7 @@ class State(models.Model):
 	name = models.CharField(max_length=20, unique=True)
 
 	def __unicode__(self):
-		return self.name.upper();
+		return "{}{}".format((self.name[0]).upper(), self.name[1:]);
 	
 	class Meta:
 		ordering = ('name',)
@@ -24,13 +24,20 @@ class SearchTerm(models.Model):
 		ordering = ('text',)
 
 class Candidate(models.Model):
-	state = models.ManyToManyField(State)
+	states = models.ManyToManyField(State)
 
 	first_name = models.CharField(max_length=15, default='')
 	last_name = models.CharField(max_length=15, default='', unique=True)
 
+	PARTY_CHOICES = (
+		('d', 'democratic'),
+		('r', 'republican'),
+		('o', 'other')
+	)
+	party = models.CharField(max_length=1, choices=PARTY_CHOICES, default='o')
+
 	def __unicode__(self):
-		return self.first_name + " " + self.last_name
+		return "{} {}".format(self.first_name, self.last_name)
 
 
 class Tweet(models.Model):

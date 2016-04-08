@@ -1,3 +1,4 @@
+# dictionary used to initialize states and search terms associated with them
 states = {  "AL" : { "name" : "alabama", "abbr" : "AL", "search_terms" : ["alabama", "al"] },
             "AK" : { "name" : "alaska" , "abbr" : "AK", "search_terms" : ["alaska", "ak"] },
             "AZ" : { "name" : "arizona" , "abbr" : "AZ", "search_terms" : ["arizona", "az"] },
@@ -49,12 +50,14 @@ states = {  "AL" : { "name" : "alabama", "abbr" : "AL", "search_terms" : ["alaba
             "WI" : { "name" : "wisconsin" , "abbr" : "WI", "search_terms" : ["wisconsin", "wi"] },
             "WY" : { "name" : "wyoming" , "abbr" : "WY", "search_terms" : ["wyoming", "wy"] },
             "other" : { "name" : "other" , "abbr" : "OT", "search_terms" : ["no state found"] }
+
     }
 
+# dictionary used to initialize candidates
 candidates = {
-	"1" : { "first" : "Hillary" , "last" : "Clinton" , "party" : "democrat" },
-	"2" : { "first" : "Bernie" , "last" : "Sanders" , "party" : "democrat" },
-	"3" : { "first" : "Donald" , "last" : "Trump" , "party" : "republican" },
-	"4" : { "first" : "Ted" , "last" : "Cruz" , "party" : "republican" },
-	"5" : { "first" : "John" , "last" : "Kasich" , "party" : "republican" }
+	"1" : { "first" : "Hillary" , "last" : "Clinton" , "party" : "d" },
+	"2" : { "first" : "Bernie" , "last" : "Sanders" , "party" : "d" },
+	"3" : { "first" : "Donald" , "last" : "Trump" , "party" : "r" },
+	"4" : { "first" : "Ted" , "last" : "Cruz" , "party" : "r" },
+	"5" : { "first" : "John" , "last" : "Kasich" , "party" : "r" }
 }
