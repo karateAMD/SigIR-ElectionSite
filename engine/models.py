@@ -44,7 +44,8 @@ class Tweet(models.Model):
 	candidate = models.ForeignKey(Candidate)
 	state = models.ForeignKey(State)
 
-	user_id = models.IntegerField(default=0)
+	# user_id = models.IntegerField(default=0)
+	created_at = models.DateField()
 	author = models.CharField(max_length=20)
 	text = models.CharField(max_length=140)
 	location = models.CharField(max_length=50)
