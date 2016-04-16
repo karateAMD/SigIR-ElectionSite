@@ -3,12 +3,12 @@ from tweepy.streaming import StreamListener
 from tweepy import OAuthHandler
 from tweepy import Stream
 from tweepy import API
-import json
-import re
+import json, re
+import seed
 
 #import django methods
 from django.core.management.base import BaseCommand, CommandError
-from engine.models import *
+from models import *
 from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -28,52 +28,64 @@ from alchemyapi import AlchemyAPI
 alchemyapi = AlchemyAPI()
 alchemyapi.apikey = keys.alchemy_apikey
 
-# tweet class
-class Tweet:
-    def __init__(self, author, text, location, sentiment):
-        self.author = author
-        self.text = text
-        self.location = location
-        self.sentiment = sentiment
-
-
 def process_tweets(tweets):
     for tweet in tweets:
         if tweet.user:
-            # get tweets author, text, location, date, and sentiment
             author = tweet.user.name.encode('ascii',errors='ignore')
             text = tweet.text.encode('ascii', errors='ignore')
-            created_at = tweet.created_at.encode('ascii',errors='ignore')
-            if (tweet.user.location):   
-                location = tweet.user.location.encode('ascii', errors='ignore')
-            else:
-                location = "other"
+            created_at = tweet.created_at
+            state = get_state(tweet.user.location)
             sentiment = get_sentiment(text)
+            candidate = get_candidates(text)
 
-            # make and store if only one candidate found  
-            candidate = get_candidates(tweet)
+            #candidate must exist to create tweet
             if candidate:
                 try:
-                    t = Tweet(candidate=candidate, state=location, created_at=created_at, 
+                    t = Tweet(candidate=candidate, state=state, created_at=created_at, 
                         author=author, text=text, sentiment=sentiment)
                     t.save()
                     print "Tweet Processed"
                 except IntegrityError as e:
                     pass
             else:
-                print "ERROR: no candidate found in text"
+                print "\n\nno candidate found in text: \n{}".format(text)
 
     return
 
+def get_state(location):
+    if (location):
+        location.encode('ascii', errors='ignore')
+        for state in seed.states.values():
+            for term in state['search_terms']:
+                if term in location:
+                    return State(name=state['name'], abbreviation=state['abbr'])
+    else:
+        return State(name='other', abbreviation='OT')
+
+
+
+
+
 
 # finds candidate(s) mentioned in the current tweet
-# returns None if 0 found or > 1 found
-def get_candidates(tweet):
-    text = tweet.text.lower()
-    candidates = re.findall(r'(trump)|(cruz)|(kasich)|(bernie|sanders)|(hillary|clinton)', text)
-    #if len(candidates) < 1 or len(candidates) > 1:
-    #    return None
-    return candidates[0]
+# returns candidate object if exactly 1 candidate found
+# otherwise returns None
+def get_candidates(text):
+    candidates = re.findall(r'trump|cruz|kasich|sanders|clinton', text.lower())
+    #return None if > 1 or < 1 candidate found (unless only repeated candidate)
+    if len(candidates) < 1:
+        return None
+    if len(candidates) > 1:
+        firstcand = candidates[0]
+        for candidate in candidates[1:]:
+            if candidate != firstcand:
+                return None
+    candidate = candidates[0]
+    for c in seed.candidates.values():
+        if c['last'].lower() == candidate:
+            return Candidate(first_name=c['first'], last_name=c['last'], party=c['party'])
+
+
 
 def get_sentiment(text):
     response = alchemyapi.sentiment("text", text)
@@ -88,6 +100,6 @@ def initialize():
     auth.set_access_token(access_token, access_token_secret)
     api = API(auth)
 
-    tweets = api.search(q = 'trump', count = 10)
+    tweets = api.search(q = 'trump | ', count = 10)
 
     process_tweets(tweets)
