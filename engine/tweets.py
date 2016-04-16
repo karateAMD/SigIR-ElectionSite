@@ -1,9 +1,11 @@
 import tweepy
 import json
-import keys
 from alchemyapi import AlchemyAPI
 import seed
 import re, string
+
+
+
 
 def process_tweet(tweet):
 	state = match_state(tweet)

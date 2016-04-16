@@ -12,3 +12,4 @@ def index(request):
 
 def get_tweets(request):
 	GetTweets.initialize()
+	return render(request, 'engine/tweets.html');

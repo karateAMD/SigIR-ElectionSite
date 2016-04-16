@@ -38,7 +38,7 @@ class Command(BaseCommand):
 					t.save()
 			except IntegrityError as e:
 				pass
-
+`
 				
 		self.stdout.write(self.style.SUCCESS('Successfully initialized states'))
 

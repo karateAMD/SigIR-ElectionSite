@@ -43,10 +43,9 @@ class Candidate(models.Model):
 class Tweet(models.Model):
 	candidate = models.ForeignKey(Candidate)
 	state = models.ForeignKey(State)
-
-	# user_id = models.IntegerField(default=0)
-	created_at = models.DateField()
+	user_id = models.IntegerField(default=0)
+	#created_at = models.DateField()
 	author = models.CharField(max_length=20)
-	text = models.CharField(max_length=140)
+	text = models.CharField(max_length=150)
 	location = models.CharField(max_length=50)
 	sentiment = models.DecimalField(max_digits=5, decimal_places=2)
