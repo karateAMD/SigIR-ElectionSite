@@ -12,8 +12,6 @@ from engine.models import *
 from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 
-
-
 # debugging
 from pprint import pprint
 from sys import exit
@@ -85,10 +83,7 @@ def get_sentiment(text):
         return response['docSentiment']
 
 
-if __name__ == "__main__":
-    
-
-    # initialize stream
+def initialize():
     auth = OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
     api = API(auth)
@@ -96,51 +91,3 @@ if __name__ == "__main__":
     tweets = api.search(q = 'trump', count = 10)
 
     process_tweets(tweets)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
