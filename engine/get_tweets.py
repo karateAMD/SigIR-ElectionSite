@@ -29,17 +29,17 @@ def process_tweets(tweets):
         if tweet.user:
             author = tweet.user.name.encode('ascii', errors='ignore')
             text = tweet.text.encode('ascii', errors='ignore')
-            #created_at = tweet.created_at
+            created_at = tweet.created_at
             location = tweet.user.location.encode('ascii', errors='ignore')
             state = get_state(location.lower())
             sentiment = get_sentiment(text)
             candidate = get_candidates(text)
 
-            #candidate must exist to create tweet
             if candidate:
                 try:
                     t = Tweet(candidate=candidate, state=state, author=author, 
-                        location=location, text=text, sentiment=sentiment)
+                        location=location, text=text, sentiment=sentiment, 
+                        created_at = created_at)
                     t.save()
                     print "Tweet Processed"
                 except IntegrityError as e:
@@ -52,14 +52,14 @@ def process_tweets(tweets):
 def get_state(location):
     if (location):
         for state in seed.states.values():
-            for term in state['search_terms']:
-                if term in location:
-                    return State.objects.get(name=state['name'])
+            if state['name'] in location:
+                return State.objects.get(name=state['name'])
+            if location.endswith(state['abbr']) or state['abbr'].upper() in location:
+                return State.objects.get(name=state['name'])
     return State.objects.get(name='other')
 
 
-# returns candidate object if exactly 1 candidate found
-# otherwise returns None
+# returns candidate object if exactly 1 candidate found (None otherwise)
 def get_candidates(text):
     candidates = re.findall(r'trump|cruz|kasich|sanders|clinton', text.lower())
     if len(candidates) < 1:
@@ -75,12 +75,15 @@ def get_candidates(text):
             return Candidate.objects.get(last_name=c['last'])
 
 
+#returns sentiment value of type decimal (0 if not found)
 def get_sentiment(text):
     response = alchemyapi.sentiment("text", text)
     if response.get('status') == 'ERROR':
-        return response['statusInfo']['score']
-    else:
         return 0
+    else:
+        if response['docSentiment']['type'] == 'neutral':
+            return 0
+        return float(response['docSentiment']['score'])
 
 
 def initialize():
@@ -88,6 +91,6 @@ def initialize():
     auth.set_access_token(access_token, access_token_secret)
     api = API(auth)
 
-    tweets = api.search(q = 'trump OR cruz OR kasich OR sandrs OR clinton', count = 5)
+    tweets = api.search(q = 'trump OR cruz OR kasich OR sandrs OR clinton', count = 25)
 
     process_tweets(tweets)

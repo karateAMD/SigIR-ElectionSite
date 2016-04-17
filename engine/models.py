@@ -2,6 +2,8 @@ from __future__ import unicode_literals
 
 from django.db import models
 
+from datetime import datetime
+
 class State(models.Model):
 	abbreviation = models.CharField(max_length=2, default='', unique=True)
 	name = models.CharField(max_length=20, unique=True)
@@ -43,8 +45,8 @@ class Candidate(models.Model):
 class Tweet(models.Model):
 	candidate = models.ForeignKey(Candidate)
 	state = models.ForeignKey(State)
-	user_id = models.IntegerField(default=0)
-	#created_at = models.DateField()
+	#user_id = models.IntegerField(default=0)
+	created_at = models.DateField(default=datetime.now)
 	author = models.CharField(max_length=20)
 	text = models.CharField(max_length=150)
 	location = models.CharField(max_length=50)
