@@ -45,9 +45,11 @@ class Candidate(models.Model):
 class Tweet(models.Model):
 	candidate = models.ForeignKey(Candidate)
 	state = models.ForeignKey(State)
-	#user_id = models.IntegerField(default=0)
 	created_at = models.DateField(default=datetime.now)
-	author = models.CharField(max_length=20)
-	text = models.CharField(max_length=150)
+	author = models.CharField(max_length=50)
+	text = models.CharField(max_length=160)
 	location = models.CharField(max_length=50)
 	sentiment = models.DecimalField(max_digits=5, decimal_places=2)
+
+	def __unicode__(self):
+		return "{} - {} - {}".format(self.state, self.candidate, self.sentiment)
