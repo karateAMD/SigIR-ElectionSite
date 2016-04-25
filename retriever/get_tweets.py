@@ -8,21 +8,21 @@ from tweepy import OAuthHandler, Stream, API
 
 #import django methods
 from django.core.management.base import BaseCommand, CommandError
-from models import *
+from engine.models import *
 from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 
-# twitter keys
-import keys
-consumer_key = keys.twitter_consumer_key
-consumer_secret = keys.twitter_consumer_secret
-access_token = keys.twitter_access_token
-access_token_secret = keys.twitter_access_token_secret
+# keys
+import utils
+# import keys
+# consumer_key = keys.twitter_consumer_key
+# consumer_secret = keys.twitter_consumer_secret
+# access_token = keys.twitter_access_token
+# access_token_secret = keys.twitter_access_token_secret
 
 # AlchemyAPI
 from alchemyapi import AlchemyAPI
 alchemyapi = AlchemyAPI()
-alchemyapi.apikey = keys.alchemy_apikey
 
 
 def process_tweets(tweets):
@@ -71,6 +71,7 @@ def get_candidates(text):
 
 #returns sentiment value of type decimal (0 if not found)
 def get_sentiment(text):
+    for key in 
     response = alchemyapi.sentiment("text", text)
     if response.get('status') == 'ERROR':
         return -2

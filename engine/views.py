@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from .models import State, SearchTerm, Candidate, Tweet
-import get_tweets as GetTweets
+from retriever import get_tweets as GetTweets
 
 def index(request):
 	states_list = State.objects.order_by('name');
