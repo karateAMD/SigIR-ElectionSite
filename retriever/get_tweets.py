@@ -5,6 +5,7 @@ from sys import exit
 # import the necessary methods from tweepy library
 from tweepy.streaming import StreamListener
 from tweepy import OAuthHandler, Stream, API
+from tweepy import TweepError
 
 #import django methods
 from django.core.management.base import BaseCommand, CommandError
@@ -12,13 +13,10 @@ from engine.models import *
 from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 
-# keys
+#retrieving keys for os environment
 import utils
-# import keys
-# consumer_key = keys.twitter_consumer_key
-# consumer_secret = keys.twitter_consumer_secret
-# access_token = keys.twitter_access_token
-# access_token_secret = keys.twitter_access_token_secret
+
+
 
 # AlchemyAPI
 from alchemyapi import AlchemyAPI
@@ -71,20 +69,42 @@ def get_candidates(text):
 
 #returns sentiment value of type decimal (0 if not found)
 def get_sentiment(text):
-    for key in 
-    response = alchemyapi.sentiment("text", text)
-    if response.get('status') == 'ERROR':
-        return -2
-    if response['docSentiment']['type'] == 'neutral':
-        return 0
-    return float(response['docSentiment']['score'])
+    for a_key in utils.get_alchemy_keys():
+        alchemyapi.apikey = a_key
+        response = alchemyapi.sentiment("text", text)
+
+        #check if current key is overused
+        if response.get('status') == 'ERROR':
+            continue
+        if response['docSentiment']['type'] == 'neutral':
+            return 0
+        return float(response['docSentiment']['score'])
 
 
 def initialize():
-    auth = OAuthHandler(consumer_key, consumer_secret)
-    auth.set_access_token(access_token, access_token_secret)
-    api = API(auth)
+    for t_keys in utils.get_twitter_keys():
+        auth = OAuthHandler(t_keys['CONSUMER_KEY'], t_keys['CONSUMER_SECRET'])
+        auth.set_access_token(t_keys['ACCESS_TOKEN'], t_keys['ACCESS_SECRET'])
+        api = API(auth)
 
-    tweets = api.search(q = 'donald OR trump OR cruz OR kasich OR bernie OR sanders OR hillary OR clinton', count = 1000)
+        tweets = api.search(q = 'donald OR trump OR cruz OR kasich OR bernie OR sanders OR hillary OR clinton', count = 50)
+       
 
-    process_tweets(tweets)
+        # Rate limit exceeded
+        #if TweepError.message[0]['code'] == 88:
+        #    continue
+
+
+        process_tweets(tweets)
+
+
+
+
+
+
+
+
+
+
+
+
