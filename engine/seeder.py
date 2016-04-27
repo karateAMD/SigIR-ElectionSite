@@ -7,9 +7,12 @@ def initialize_states():
 	statesAdded = 0
 	termsAdded = 0;
 	for state in seed.states:
-		s, created_s = State.objects.get_or_create(abbreviation=seed.states[state]["abbr"], name=seed.states[state]["name"])
-		if created_s:
-			statesAdded += 1
+		try:
+			s, created_s = State.objects.get_or_create(abbreviation=seed.states[state]["abbr"], name=seed.states[state]["name"])
+			if created_s:
+				statesAdded += 1
+		except IntegrityError as e:
+			pass
 
         # create search terms
         for term in seed.states[state]["search_terms"]:

@@ -12,6 +12,7 @@ from django.core.management.base import BaseCommand, CommandError
 from engine.models import *
 from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 
 #retrieving keys for os environment
 import utils
@@ -24,6 +25,7 @@ alchemyapi = AlchemyAPI()
 
 
 def process_tweets(tweets):
+    newTweetsAdded = 0
     for tweet in tweets:
         if tweet.user:
             author = tweet.user.name.encode('ascii', errors='ignore')
@@ -35,26 +37,39 @@ def process_tweets(tweets):
             if candidate and state:
                 sentiment = get_sentiment(text)
                 if sentiment == -2:
-                    print "error getting sentiment"
+                    print "Error getting sentiment"
                     continue
                 try:
-                    t = Tweet(candidate=candidate, state=state, author=author, 
-                        location=location, text=text, sentiment=sentiment, 
-                        created_at = created_at)
-                    t.save()
-                    print "Tweet Processed"
+                    t, created = Tweet.objects.get_or_create(candidate=candidate, state=state, author=author, location=location, text=text, sentiment=sentiment, created_at = created_at)
+                    if created:
+                    	print "Tweet Processed"
+                    	newTweetsAdded += 1
+                    else:
+                    	print "Duplicate Tweeet"
                 except IntegrityError as e:
-                    pass
+                   print "IntegrityError" 
+    print "\nNew tweets Added : {}".format(newTweetsAdded)
+    print "Total tweets in database : {}".format(Tweet.objects.all().count())
 
 #state returned if specified, otherwise return other
 def get_state(location):
     if (location):
+    	# separate test for D.C.
+    	if("washington" in location) and ("dc" in location or "d.c." in location):
+    		return State.objects.get(name="Washington, D.C.")
         for state in State.objects.all():
-            if state.name in location:
+            if state.name.lower() in location:
                 return State.objects.get(name=state.name)
             if location.endswith(state.abbreviation) or state.abbreviation.upper() in location:
                 return State.objects.get(name=state.name)
     return None
+    """
+    qset = Q()
+    for term in location.split():
+	qset |= Q(name__contains=term) | Q(abbreviation__contains=term)
+	location = State.objects.filter(qset).first()
+	return location 
+	"""
 
 # returns candidate object if exactly 1 candidate found (None otherwise)
 def get_candidates(text):
@@ -87,7 +102,7 @@ def initialize():
         auth.set_access_token(t_keys['ACCESS_TOKEN'], t_keys['ACCESS_SECRET'])
         api = API(auth)
 
-        tweets = api.search(q = 'donald OR trump OR cruz OR kasich OR bernie OR sanders OR hillary OR clinton', count = 50)
+        tweets = api.search(q = 'donald OR trump OR cruz OR kasich OR bernie OR sanders OR hillary OR clinton', count = 100)
        
 
         # Rate limit exceeded

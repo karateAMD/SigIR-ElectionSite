@@ -47,9 +47,12 @@ class Tweet(models.Model):
 	state = models.ForeignKey(State)
 	created_at = models.DateField(default=datetime.now)
 	author = models.CharField(max_length=50)
-	text = models.CharField(max_length=160)
+	text = models.CharField(max_length=160, unique=True)
 	location = models.CharField(max_length=50)
 	sentiment = models.DecimalField(max_digits=5, decimal_places=2)
 
 	def __unicode__(self):
 		return "{} - {} - {}".format(self.state, self.candidate, self.sentiment)
+	
+	class Meta:
+		ordering = ('state', 'candidate',)

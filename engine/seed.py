@@ -7,6 +7,7 @@ states = {  "AL" : { "name" : "alabama", "abbr" : "AL", "search_terms" : ["alaba
             "CO" : { "name" : "colorado" , "abbr" : "CO", "search_terms" : ["colorado", "co"] },
             "CT" : { "name" : "connecticut" , "abbr" : "CT", "search_terms" : ["connecticut", "ct"] },
             "DE" : { "name" : "delaware", "abbr" : "DE" , "search_terms" : ["delaware", "de"] },
+            "DC" : { "name" : "Washington, D.C.", "abbr" : "DC" , "search_terms" : ["washington, d.c.", "dc", "d.c."] },
             "FL" : { "name" : "florida" , "abbr" : "FL", "search_terms" : ["florida", "fl"] },
             "GA" : { "name" : "georgia", "abbr" : "GA", "search_terms" : ["georgia", "ga"] },
             "HI" : { "name" : "hawaii" , "abbr" : "HI", "search_terms" : ["hawaii", "hi"] },
