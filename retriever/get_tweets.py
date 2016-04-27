@@ -96,15 +96,3 @@ def initialize():
 
 
         process_tweets(tweets)
-
-
-
-
-
-
-
-
-
-
-
-
