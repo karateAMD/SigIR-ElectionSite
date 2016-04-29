@@ -32,7 +32,7 @@ def process_tweets(tweets):
             text = tweet.text.encode('ascii', errors='ignore')
             created_at = tweet.created_at
             location = tweet.user.location.encode('ascii', errors='ignore')
-            state = get_state(location.lower())
+            state = get_state(location)
             candidate = get_candidates(text.lower())
             if candidate and state:
                 sentiment = get_sentiment(text)
@@ -45,7 +45,7 @@ def process_tweets(tweets):
                     	print "Tweet Processed"
                     	newTweetsAdded += 1
                     else:
-                    	print "Duplicate Tweeet"
+                    	print "Duplicate Tweet"
                 except IntegrityError as e:
                    print "IntegrityError" 
     print "\nNew tweets Added : {}".format(newTweetsAdded)
@@ -53,23 +53,17 @@ def process_tweets(tweets):
 
 #state returned if specified, otherwise return other
 def get_state(location):
-    if (location):
-    	# separate test for D.C.
-    	if("washington" in location) and ("dc" in location or "d.c." in location):
-    		return State.objects.get(name="Washington, D.C.")
-        for state in State.objects.all():
-            if state.name.lower() in location:
-                return State.objects.get(name=state.name)
-            if location.endswith(state.abbreviation) or state.abbreviation.upper() in location:
-                return State.objects.get(name=state.name)
+    if location != "":
+    	qset = Q()
+    	for term in location.split():
+    		if term.lower() == "new":
+    			continue
+    		qset |= Q(name__contains=term)
+    		if (len(term) == 2):
+    			qset |= Q(abbreviation__exact=term)
+    	location = State.objects.filter(qset).first()
+    	return location 
     return None
-    """
-    qset = Q()
-    for term in location.split():
-	qset |= Q(name__contains=term) | Q(abbreviation__contains=term)
-	location = State.objects.filter(qset).first()
-	return location 
-	"""
 
 # returns candidate object if exactly 1 candidate found (None otherwise)
 def get_candidates(text):
@@ -95,6 +89,22 @@ def get_sentiment(text):
             return 0
         return float(response['docSentiment']['score'])
 
+# resorts tweets in database if needed
+def resort():
+	tweetsModified = 0
+	for tweet in Tweet.objects.all():
+		s = get_state(tweet.location)
+		if s == None:
+			continue
+		if tweet.state != s:
+			tweet.state = s
+			tweet.save()
+			tweetsModified += 1
+	
+	print "Tweets modified : {}".format(tweetsModified)
+	print "Total tweets in database : {}".format(Tweet.objects.all().count())
+		
+
 
 def initialize():
     for t_keys in utils.get_twitter_keys():
@@ -102,7 +112,7 @@ def initialize():
         auth.set_access_token(t_keys['ACCESS_TOKEN'], t_keys['ACCESS_SECRET'])
         api = API(auth)
 
-        tweets = api.search(q = 'donald OR trump OR cruz OR kasich OR bernie OR sanders OR hillary OR clinton', count = 100)
+        tweets = api.search(q = 'donald OR trump OR cruz OR kasich OR bernie OR sanders OR hillary OR clinton', lang='en', count = 100)
        
 
         # Rate limit exceeded

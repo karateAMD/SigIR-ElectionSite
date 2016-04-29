@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from .models import State, SearchTerm, Candidate, Tweet
+from .models import State, Candidate, Tweet
 from retriever import get_tweets as GetTweets
 
 def index(request):

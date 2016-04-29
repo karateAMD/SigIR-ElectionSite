@@ -1,29 +1,19 @@
 # initializes States and Candidates
 
 import seed
-from models import State, Candidate, SearchTerm
+from models import State, Candidate
+import IPython
+from django.db import IntegrityError
 
 def initialize_states():
 	statesAdded = 0
-	termsAdded = 0;
 	for state in seed.states:
-		try:
-			s, created_s = State.objects.get_or_create(abbreviation=seed.states[state]["abbr"], name=seed.states[state]["name"])
-			if created_s:
-				statesAdded += 1
-		except IntegrityError as e:
-			pass
+		s, created_s = State.objects.get_or_create(abbreviation=seed.states[state]["abbr"], name=seed.states[state]["name"])
+		if created_s:
+			statesAdded += 1
 
-        # create search terms
-        for term in seed.states[state]["search_terms"]:
-            t, created_t = SearchTerm.objects.get_or_create(text=term, state=s)
-            if created_t:
-                termsAdded += 1
-	
 	print "New states added : {}".format(statesAdded)
-	print "New search terms added : {}".format(termsAdded)
 	print "Total states in database : {}".format(State.objects.all().count())
-
 
 def initialize_candidates():
 	candidatesAdded = 0

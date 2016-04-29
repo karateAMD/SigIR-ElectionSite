@@ -14,17 +14,6 @@ class State(models.Model):
 	class Meta:
 		ordering = ('name',)
 
-class SearchTerm(models.Model):
-	state = models.ForeignKey(State)
-
-	text = models.CharField(max_length=20, unique=True)
-
-	def __unicode__(self):
-		return self.text
-	
-	class Meta:
-		ordering = ('text',)
-
 class Candidate(models.Model):
 	states = models.ManyToManyField(State)
 
